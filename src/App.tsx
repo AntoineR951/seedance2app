@@ -5,6 +5,9 @@ import { generateSeedancePrompt, generateStartingImage, PromptData } from './ser
 import { auth, db, signInWithGoogle, logOut } from './firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, doc, setDoc, getDoc } from 'firebase/firestore';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { storage } from './firebase'; // Importez l'instance storage que vous venez d'ajouter
+
 
 const CAMERA_OPTIONS = [
   "Dynamique (FPV, Drone)",
@@ -142,7 +145,7 @@ export default function App() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+ const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsGenerating(true);
     setError(null);
@@ -151,6 +154,7 @@ export default function App() {
     setIsCopied(false);
 
     try {
+      // 1. Génération du prompt et de l'image
       const prompt = await generateSeedancePrompt(formData);
       setGeneratedPrompt(prompt);
       
@@ -158,11 +162,34 @@ export default function App() {
       setGeneratedImage(image);
 
       if (user) {
+        let finalImageUrl = null;
+
+        // 2. Si une image a été générée, on l'envoie vers Storage
+        if (image && image.startsWith('data:')) {
+          try {
+            // Création d'une référence unique dans Storage
+            const storageRef = ref(storage, `users/${user.uid}/history/${Date.now()}.png`);
+            
+            // Upload du base64 vers Storage
+            await uploadString(storageRef, image, 'data_url');
+            
+            // Récupération de l'URL finale
+            finalImageUrl = await getDownloadURL(storageRef);
+          } catch (uploadErr) {
+            console.error("Erreur lors de l'upload vers Storage:", uploadErr);
+            // Optionnel : on garde l'image null ou on gère l'erreur
+          }
+        } else {
+          // Si l'image est déjà une URL (http...), on l'utilise directement
+          finalImageUrl = image;
+        }
+
+        // 3. Enregistrement dans Firestore avec l'URL (très légère)
         await addDoc(collection(db, `users/${user.uid}/history`), {
           uid: user.uid,
           formData,
           generatedPrompt: prompt,
-          generatedImage: image || null,
+          generatedImage: finalImageUrl, // On stocke l'URL Firebase Storage ici
           createdAt: serverTimestamp()
         });
       }
@@ -172,7 +199,6 @@ export default function App() {
       setIsGenerating(false);
     }
   };
-
   const copyToClipboard = async () => {
     if (!generatedPrompt) return;
     try {
