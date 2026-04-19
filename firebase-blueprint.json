@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "A user of the application",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "PromptHistory": {
+      "title": "PromptHistory",
+      "description": "A generated prompt and image history item",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "formData": {
+          "type": "object",
+          "properties": {
+            "baseIdea": { "type": "string" },
+            "subject": { "type": "string" },
+            "environment": { "type": "string" },
+            "camera": { "type": "string" },
+            "lighting": { "type": "string" },
+            "style": { "type": "string" }
+          }
+        },
+        "generatedPrompt": { "type": "string" },
+        "generatedImage": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "formData", "generatedPrompt", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/users/{userId}/history/{historyId}": {
+      "schema": { "$ref": "#/entities/PromptHistory" },
+      "description": "User's generated prompts history"
+    }
+  }
+}
