@@ -1,10 +1,8 @@
 {
-  "projectId": "geometric-smoke-140818",
-  "appId": "1:211993266999:web:ff03704a9976706adee8b2",
-  "apiKey": "AIzaSyB_EAIcqkmZRQ6ciXB54FpTr11Ef-WeHYo",
-  "authDomain": "geometric-smoke-140818.firebaseapp.com",
-  "firestoreDatabaseId": "ai-studio-817c2b8c-ab7a-41c5-92d8-cc7676aa3afb",
-  "storageBucket": "geometric-smoke-140818.firebasestorage.app",
-  "messagingSenderId": "211993266999",
-  "measurementId": ""
+  "projectId": "seedance2-b51e8",
+  "appId": "1:92688820808:web:9625f98d4b1eb1ed11c67d",
+  "apiKey": "AIzaSyAi1LmZvcgVMSrQBVJJmZAalBu5tMRNq6o",
+  "authDomain": "seedance2-b51e8.firebaseapp.com",
+  "storageBucket": "seedance2-b51e8.firebasestorage.app",
+  "messagingSenderId": "92688820808"
 }
